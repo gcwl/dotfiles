@@ -1,0 +1,63 @@
+[user]
+    name = ???
+    email = *@*.*
+
+[push]
+    default = simple
+
+[diff]
+    tool = vimdiff
+
+[merge]
+    tool = meld
+
+[color]
+    ui = true
+
+[grep]
+    color = auto
+    lineNumber = true
+    extendRegexp = true
+
+[alias]
+    # list all aliases
+    la = "!git config -l | grep alias | cut -c 7-"
+
+    # lazy fingers
+    st = status
+    ci = commit
+    co = checkout
+    br = branch -vv
+    rt = remote -vv
+
+    # http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/
+
+    df = diff --word-diff
+    dc = diff --cached
+    dlc = diff --cached HEAD^
+
+    unstage = reset HEAD
+    r0 = reset
+    r1 = reset HEAD^
+    r2 = reset HEAD^^
+    rh = reset --hard
+    rh1 = reset HEAD^ --hard
+    rh2 = reset HEAD^^ --hard
+
+    # grep
+    # http://travisjeffery.com/b/2012/02/search-a-git-repo-like-a-ninja/
+    g = grep --break --heading
+    #g = grep --break --heading --line-number
+
+    # pretty graphs/logs
+    # man git-log
+    # https://stackoverflow.com/questions/1057564/pretty-git-branch-graphs
+    l   = log --graph --pretty=format:'%C(auto)%h -%C(auto)%d %s %C(magenta)[%cr, %C(ul green)%an%C(reset)%C(magenta)]%C(reset)' --date=relative
+    ll  = "!git l --branches"
+    lll = log --graph --decorate --pretty=medium --date=relative --stat --branches
+    l12 = "!git ll --stat --since='12 hours ago'"
+    ld  = "!git ll --stat --since='yesterday'"
+    lw  = "!git ll --stat --since='last week'"
+    lm  = "!git ll --stat --since='last month'"
+
+    forget = rm --cached
