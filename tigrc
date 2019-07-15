@@ -1,0 +1,11 @@
+set commit-order = topo
+#set diff-options = --word-diff --color
+
+set main-view = \
+	line-number:display=yes,interval=5 \
+	id:display=yes,width=0 \
+	date:relative \
+	author:full \
+	commit-title:graph=yes,refs=yes,overflow=yes
+
+bind main G :toggle commit-order
