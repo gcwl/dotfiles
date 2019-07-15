@@ -1,0 +1,73 @@
+!
+! xterm
+!
+xterm*scrollBar:    true
+xterm*cursorBlink:  true
+xterm*font:         -*-fixed-medium-*-*-*-14-*-*-*-*-*-*-*
+
+xterm*saveLines:    65536
+xterm*foreground:   green3
+xterm*background:   grey3
+
+
+!!
+!! rxvt
+!!
+!rxvt*scrollBar:    true
+!rxvt*cursorBlink:  true
+!rxvt*font:         -*-fixed-medium-*-*-*-14-*-*-*-*-*-*-*
+!
+!rxvt*saveLines:    65536
+!rxvt*foreground:   green3
+!rxvt*background:   grey3
+
+
+!
+! urxvt
+!
+urxvt*scrollBar:     true
+urxvt*cursorBlink:   true
+urxvt*geometry:      140x40
+urxvt*font:          -*-fixed-medium-*-*-*-14-*-*-*-*-*-*-*
+
+urxvt*saveLines:     65536
+urxvt*foreground:    grey80
+urxvt*background:    grey3
+
+
+!! https://wiki.archlinux.org/index.php/Font_configuration#Applications_without_fontconfig_support
+!Xft.autohint: 0
+!Xft.lcdfilter: lcddefault
+!Xft.hintstyle: hintslight
+!Xft.hinting: 1
+!Xft.antialias: 1
+!Xft.rgba: rgb
+
+
+!
+! Choices
+!
+!urxvt*foreground:   grey80
+!urxvt*background:   grey3
+
+!urxvt*foreground:   black
+!urxvt*background:   grey95
+
+!urxvt*foreground:   green3
+!urxvt*background:   grey3
+
+!urxvt*foreground:   mediumspringgreen
+!urxvt*background:   grey3
+
+!urxvt*foreground:   lightslateblue
+!urxvt*background:   grey3
+
+!urxvt*foreground:   slategray2
+!urxvt*background:   grey3
+
+
+!
+! Useful Resources
+!
+! http://www.farb-tabelle.de/en/table-of-color.htm
+! http://critical.ch/xterm/
