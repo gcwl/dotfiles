@@ -1,0 +1,17 @@
+#!/usr/bin/sh
+
+[[ -n $(/usr/bin/pgrep -x xinit) ]] && {
+
+    # keyboard and mouse rate
+    xset r rate 200 55
+    xset m 1/1 0
+
+    ## xmodmap rebind Insert key
+    ## on Macbook, insert = shift + delete
+    #eval $(xmodmap -e "keycode 22 = BackSpace Insert BackSpace Insert")
+
+    ## swap left-Alt and left-win
+    #eval $(xmodmap -e "keycode  64 = Super_L NoSymbol Super_L")
+    #eval $(xmodmap -e "keycode 133 = Alt_L Meta_L Alt_L Meta_L)
+
+}

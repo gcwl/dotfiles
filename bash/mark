@@ -1,0 +1,23 @@
+#!/bin/sh
+
+export MARKPATH=$HOME/.marks
+
+# jump to mark
+j () {
+# XXX currently using "\cd" only half-fixing the bug
+  which fzf &>/dev/null
+  if [ $? -eq 0 ] && [ -z $1 ]; then
+    local mark=$(/usr/bin/ls -lnr --time-style=+? $MARKPATH | sed '2,$!d' | cut -d' ' -f7- | fzf)
+    \cd -P $(echo $mark | sed 's/^.*-> //')
+  else
+    \cd -P "$MARKPATH/$1" 2>/dev/null || echo "No such mark: $1"
+  fi
+}
+
+# mark current part
+mark    () { /usr/bin/mkdir -p "$MARKPATH"; ln -s "$(pwd)" "$MARKPATH/$1"; }
+
+# list all marks
+lsmarks () { /usr/bin/ls -l "$MARKPATH"; }
+
+# vim: set ts=8 sw=2 tw=0 et ft=sh :

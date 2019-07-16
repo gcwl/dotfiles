@@ -1,0 +1,137 @@
+alias diff='vimdiff'
+# alias srm='srm --dod -vv'
+alias srm='shred -v -n7 -u -z'
+alias du='du -csh'
+alias mc='mc --nosubshell'
+alias fm='ranger'
+alias gpg='gpg2'
+
+
+alias echopath='echo $PATH | tr ":" "\n"'
+alias howmanylines='find -type f | xargs wc -l'
+
+
+# x11
+#alias startx='startx &> ~/.xlog'
+alias xc='xclip'
+alias xcc='xclip -sel clip'     # usage: $ xcc < /path/to/file
+#alias df='df -h'
+alias df='dfc -d -c auto -T -W'    # dfc: color df
+alias oo='xdg-open'
+alias mupdf='mupdf -r144'       # default resolution 144dpi
+#alias feh='feh -F --info "exiv2 %F"'
+alias feh='feh -. --info "exiv2 %F" --draw-tinted 2>/dev/null'
+
+
+# ps
+alias psgrep='ps aux | head -1; ps aux | grep $1'                          # ps grep
+alias pstree='ps xawf -eo ppid,pid,tt,user,group,etime,stat,args | $PAGER' # ps tree
+alias topmem='ps auxw --sort -rss | $PAGER'
+#alias topmem='(ps aux | head -1; ps aux | tail -n +2 | sort -nr -k 4) | $PAGER'      # top processes eating memory
+alias topcpu='(ps aux | head -1; ps aux | tail -n +2 | sort -nr -k 3) | $PAGER'      # top processes eating cpu
+
+
+# system info
+alias lscpu='cat /proc/cpuinfo'
+alias lsmem='free -mlt'
+#alias lsgpu='grep memory /var/log/Xorg.0.log'
+#function lsgpu() {
+## NOTE: nvidia-smi does not support GeForce GTS 450
+## https://stackoverflow.com/questions/9190856/alternative-to-nvidia-smi-for-measuring-gpu-utilization
+## http://pastebin.com/ahj2z7bS
+#
+#    local gpulist=`nvidia-settings -t -q gpus`
+#    local gpulist=`echo "$gpulist" | sed -e 's/^ *//'` # no leading spaces
+#    local gpulist=`echo "$gpulist" | grep -e '^\['`
+#
+#    echo $gpulist | while read LINE; do
+#        local gpuid=`echo "$LINE" | cut -d \  -f 2 | grep -E -o '\[.*\]'`
+#        local gpuname=`echo "$LINE" | cut -d \  -f 3-`
+#
+#        local gpuutilstats=`nvidia-settings -t -q "$gpuid"/GPUUtilization | tr ',' '\n'`
+#        local gputemp=`nvidia-settings -t -q "$gpuid"/GPUCoreTemp`
+#        local gputotalmem=`nvidia-settings -t -q "$gpuid"/TotalDedicatedGPUMemory`
+#        local gpuusedmem=`nvidia-settings -t -q "$gpuid"/UsedDedicatedGPUMemory`
+#
+#        local gpuusage=`echo "$gpuutilstats"|grep graphics|sed 's/[^0-9]//g'`
+#        local memoryusage=`echo "$gpuutilstats"|grep memory|sed 's/[^0-9]//g'`
+#        local bandwidthusage=`echo "$gpuutilstats"|grep PCIe|sed 's/[^0-9]//g'`
+#
+#        echo "$gpuid $gpuname"
+#        echo -e "    Running at             : $gpuusage%"
+#        echo -e "    Current temperature    : $gputemp°C"
+#        echo -e "    Memory usage           : ${gpuusedmem}Mb/${gputotalmem}Mb"
+#        echo -e "    Memory bandwidth usage : $memoryusage%"
+#        echo -e "    PCIe bandwidth usage   : $bandwidthusage%"
+#    done
+#}
+
+
+# netstat
+#alias lstcp='netstat -eev --wide -pa --numeric-ports -t'
+#alias lsudp='netstat -eev --wide -pa --numeric-ports -u'
+alias lstcp='(echo "Proto Recv-Q Send-Q Local-Address Foreign-Address State User Inode PID/Program-name"; netstat -eev --wide -pa --numeric-ports -t 2>/dev/null | tail -n +3) | column -t'
+alias lsudp='(echo "Proto Recv-Q Send-Q Local-Address Foreign-Address State User Inode PID/Program-name"; netstat -eev --wide -pa --numeric-ports -u 2>/dev/null | tail -n +3) | column -t'
+alias lsnet='(echo "Proto Recv-Q Send-Q Local-Address Foreign-Address State User Inode PID/Program-name"; netstat -eev --wide -pa --numeric-ports -tu 2>/dev/null | tail -n +3) | column -t'
+alias lswww='(echo "Proto Recv-Q Send-Q Local-Address Foreign-Address State User Inode PID/Program-name"; lstcp | grep -e ":80" -e ":443") | column -t'
+# find an unused unprivileged port
+function get_port () {
+  (netstat -4 --all --numeric --tcp --udp | awk '{printf "%s\n%s\n", $4, $4}' | grep -oE '[0-9]+$'; seq ${2:-20000} ${3:-65000}) \
+    | sort -n \
+    | uniq -u \
+    | shuf \
+    | head -n ${1:-1}
+}
+
+
+# network tools
+alias mtr='mtr -b'
+alias sshfs='sshfs -o follow_symlinks'
+alias nload='nload -t 500 -u h'
+
+
+# tree
+alias tree='/usr/bin/tree -a --dirsfirst'
+function tt() { tree --filelimit ${1:-20}; }
+
+
+# fix filename (uppercase to lowercase, space to dash)
+alias fixname='/usr/bin/perl-rename --dry-run --verbose "y/A-Z /a-z-/"'
+alias fixname4real='/usr/bin/perl-rename --verbose "y/A-Z /a-z-/"'
+
+
+# cal/date
+alias cal='cal -y'              # show this year
+now () {
+  date $@ "+[%Z] %Y-%m-%dT%H:%M:%S"
+  date $@ "+[%Z] %Y-%m-%d"
+  date $@ "+[%Z] %H:%M:%S"
+}
+
+
+alias weather='curl -s wttr.in/Hong_Kong'
+
+
+# silver searcher
+alias a='/usr/bin/ag --depth 10 --follow --hidden --all-text --smart-case --context --color --head --pager="less -r"'
+
+
+# highlight with rg
+alias hl='/usr/bin/rg --no-config --max-depth 1 --pretty --passthru'
+## highlight with ack
+#alias hl='ack --ackrc /dev/null --color --passthru'
+## highlight pattern in a file
+# grep -E --color '<pattern>|' file
+# e.g. highlight 'ee$'
+# grep -E --color 'ee$|' file
+
+
+# git related
+alias gist='gist --copy --shorten --private'    # https://github.com/defunkt/gist
+alias tig='tig --all'
+
+
+# Convert a single-page PDF to a hi-res PNG at 300dpi
+function pdf2png() { convert -density 300x300 $1 $2; }
+
+# vim: set ts=8 sw=2 tw=0 et ft=sh :

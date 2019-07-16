@@ -1,0 +1,36 @@
+# add/list ssh key to ssh-agent via keychain
+
+#sshkey { eval $(keychain --eval --agents ssh --timeout 180 -Q $HOME/.ssh/$1); }
+sshkey ()
+{
+  local keyspath=$HOME/.ssh/keys
+  if [ -n "$1" ]; then
+    # add key to keychain if keyname is provided
+    local keyfile=$keyspath/$1
+    if [ ! -e $keyfile ]; then
+      echo "$keyfile does not exists"
+    elif [ ! -f $keyfile ]; then
+      echo "$keyfile is not a file"
+    else
+      eval $(keychain --agents ssh --quick --eval)
+      ssh-add -t 3h $keyfile
+    fi
+  else
+    local keys=$(find $keyspath -type f ! -iregex '.*pub$' -exec basename -a {} \;)
+    echo "Usage:"
+    echo -e "\tsshkey <key1 key2 ...>\t# add key(s) to keychain"
+    echo -e "\tsshkey\t\t\t# list keys in keychain\n"
+    echo "Possible keys:"
+    echo $keys
+  fi
+
+  # list keys
+  echo
+  echo -e "Current keys in keychain:"
+  ssh-add -l
+}
+
+# source keychain env variales
+[[ -f $HOME/.keychain/$HOSTNAME-sh ]] && source $HOME/.keychain/$HOSTNAME-sh
+
+# vim: set ts=8 sw=2 tw=0 et ft=sh :

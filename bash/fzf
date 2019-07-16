@@ -1,0 +1,211 @@
+#!/bin/bash
+
+# # fzf ack/grep
+# alias fa='ag --follow --hidden --nobreak --nonumbers --noheading . | fzf'
+# # TODO to do what after fuzzy grepping?
+
+
+# find | fzf
+# $1 - find's maxdepth
+# $2 - fzf's query parameter
+# usage: findfzf [depth [query]]
+# if ctrl-e is pressed, cd into directory and then open file using editor
+# if Enter is pressed, cd into parent directory
+# if Esc is pressed, do nothing
+findfzf () {
+  local path match find_args query
+  [[ -n $1 ]] && find_args="-L . -maxdepth $1 -xdev" || find_args="-L . -xdev"
+  [[ -n $2 ]] && query="-q ${@:2}" || query=""
+  IFS=$'\n' match=($(echo $find_args | xargs find 2>/dev/null | fzf $query --expect=ctrl-e))
+  if [[ ${match[0]} = "ctrl-e" ]]; then
+    # if ctrl-e is pressed, cd into parent directory, then open file using editor
+    path=${match[1]}
+    \cd -P $(dirname $path)
+    ${EDITOR:-vi} $(basename $path)
+  else
+    # if enter is pressed, cd into directory
+    path=${match[0]}
+    if [[ -n $path ]]; then
+      [[ -d $path ]] && \cd -P $path || \cd -P $(dirname $path)
+    fi
+  fi
+}
+alias f='findfzf 10'  # default depth
+
+
+# fzf history
+h () {
+  local regex='s/^\s*[0-9]+\s+[0-9-]+\s+[0-9:]+\s+//'
+  # https://unix.stackexchange.com/questions/213799/can-bash-write-to-its-own-input-stream
+  history | fzf --no-sort --tac | sed -re $regex | \
+      perl -e 'ioctl STDOUT, 0x5412, $_ for split //, <>'
+  # history | fzf --no-sort --tac | awk '{$1=$2=$3="";print}'
+}
+
+
+# ftags - search ctags
+ftags () {
+  local line
+  [ -e tags ] &&
+  line=$(
+    awk 'BEGIN { FS="\t" } !/^!/ {print toupper($4)"\t"$1"\t"$2"\t"$3}' tags |
+    cut -c1-80 | fzf --nth=1,2
+  ) && ${EDITOR:-vim} $(cut -f3 <<< "$line") -c "set nocst" -c "silent tag $(cut -f2 <<< "$line")"
+}
+
+
+## fshow - git commit browser
+#fgit () {
+#  git log --graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+#  fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+#      --bind "ctrl-m:execute:
+#                (grep -o '[a-f0-9]\{7\}' | head -1 |
+#                xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+#                {}
+#FZF-EOF"
+#}
+
+
+# git grep
+# always grep from toplevel (gitroot)
+# hit enter to open file
+ggfzf () {
+  local gitroot # cannot combine this and next line
+                # if combined, exit status ($?) would refer to variable declaration
+  gitroot=$(git rev-parse --show-toplevel 2>/dev/null)
+  if [ $? -eq 0 ]; then
+    local match path lineno
+    IFS=':' match=($(git grep --no-color -nI . -- $gitroot | \
+                   /usr/bin/fzf --no-sort --reverse --preview 'preview.sh {}' --preview-window 'down:50%' | \
+                   cut -d':' -f1,2))
+    # echo ${match[@]}
+    if [ ${#match[@]} -eq 2 ]; then
+      path=${match[0]}
+      lineno=${match[1]}
+      \cd -P $(dirname $path)
+      ${EDITOR:-vi} $(basename $path) +${lineno}
+    fi
+  else
+    echo "Not a git repo."
+  fi
+}
+
+
+## fstash - easier way to deal with stashes
+## type fstash to get a list of your stashes
+## enter shows you the contents of the stash
+## ctrl-d shows a diff of the stash against your current HEAD
+## ctrl-b checks the stash out as a branch, for easier merging
+#fstash () {
+#  local out q k sha
+#  while out=$(
+#    git stash list --pretty="%C(yellow)%h %>(14)%Cgreen%cr %C(blue)%gs" |
+#    fzf --ansi --no-sort --query="$q" --print-query \
+#        --expect=ctrl-d,ctrl-b);
+#  do
+#    mapfile -t out <<< "$out"
+#    q="${out[0]}"
+#    k="${out[1]}"
+#    sha="${out[-1]}"
+#    sha="${sha%% *}"
+#    [[ -z "$sha" ]] && continue
+#    if [[ "$k" == 'ctrl-d' ]]; then
+#      git diff $sha
+#    elif [[ "$k" == 'ctrl-b' ]]; then
+#      git stash branch "stash-$sha" $sha
+#      break;
+#    else
+#      git stash show -p $sha
+#    fi
+#  done
+#}
+
+
+## ag grep | fzf
+## $1 - ag's depth
+## $2 - ag's search term
+## usage: agfzf [depth [search_term]]
+## if Enter is pressed, cd into parent directory
+## if Esc is pressed, do nothing
+#agfzf () {
+#  local DEPTH
+#  [[ -n $1 ]] && DEPTH="--depth $1" || DEPTH=""
+#  local AG_ARGS="$DEPTH --follow --hidden --all-text --smart-case --nobreak --noheading"
+#  [[ -n $2 ]] && AG_ARGS=${AG_ARGS}" --color $2" || AG_ARGS=${AG_ARGS}" --nocolor '^[^\n]+$'"       # XXX WRONG pattern!!!
+#  # [[ -n $2 ]] && AG_ARGS=${AG_ARGS}" --color $2" || AG_ARGS=${AG_ARGS}" --nocolor '^[\s\S]+$'"
+#  # [[ -n $2 ]] && AG_ARGS=${AG_ARGS}" --color $2" || AG_ARGS=${AG_ARGS}" --nocolor '(.*?)'"
+#  local MATCH
+#  IFS=':' MATCH=($(echo ${AG_ARGS} | xargs /usr/bin/ag 2>/dev/null | \
+#                   /usr/bin/fzf --no-sort --ansi --reverse --preview 'preview.sh {}' --preview-window 'down:50%' | \
+#                   cut -d':' -f1,2))
+#  # echo ${MATCH[@]}
+#  if [ ${#MATCH[@]} -eq 2 ]; then   # enter is pressed
+#    path=${MATCH[0]}
+#    lineno=${MATCH[1]}
+#    # cd into parent directory
+#    \cd -P $(dirname $path)
+#    # then open file using editor
+#    ${EDITOR:-vi} $(basename $path) +${lineno}
+#  fi
+#}
+#alias ag='agfzf 6'   # default depth
+
+
+# ripgrep | fzf
+## $1 - max-depth; depth level exclusive (i.e. when max-depth=4, search depth=3)
+## $2 - search term
+## usage: rgfzf [max-depth [search_term]]
+## if Enter is pressed, cd into parent directory
+## if Esc is pressed, do nothing
+rgfzf () {
+  local DEPTH
+  [[ -n $1 ]] && DEPTH="--max-depth $1" || DEPTH=""
+  local RG_ARGS="$DEPTH --follow --hidden --smart-case --line-number --no-heading --no-ignore"
+  [[ -n $2 ]] && RG_ARGS=${RG_ARGS}" --color auto -e $2" || RG_ARGS=${RG_ARGS}" --color never -e '.+'"
+  local MATCH
+  IFS=':' MATCH=($(echo ${RG_ARGS} | xargs /usr/bin/rg 2>/dev/null | \
+                   /usr/bin/fzf --no-sort --ansi --reverse --preview 'preview.sh {}' --preview-window 'down:50%' | \
+                   cut -d':' -f1,2))
+  # echo ${MATCH[@]}
+  if [ ${#MATCH[@]} -eq 2 ]; then   # enter is pressed
+    path=${MATCH[0]}
+    lineno=${MATCH[1]}
+    # cd into parent directory
+    \cd -P $(dirname $path)
+    # then open file using editor
+    ${EDITOR:-vi} $(basename $path) +${lineno}
+  fi
+
+}
+alias gg='rgfzf 4'  # max-depth=4 (i.e. search depth=3)
+
+
+# find directories | fzf
+# $1 - depth (default=3)
+# usage: fd [depth]
+finddirs () {
+  local match max_depth
+  [[ -n $1 ]] && max_depth="$1" || max_depth="3"
+  IFS=$'\n' match=($(find -mindepth 1 -maxdepth $max_depth -xdev -type d | fzf))
+  # `cd` into matched directory
+  if [ -n "$match" ]; then
+    \cd -P "$match"
+  fi
+}
+alias fd='finddirs'
+
+
+# find git directories | fzf
+# $1 - depth (default=6)
+gitdirs () {
+  local match max_depth
+  [[ -n $1 ]] && max_depth="$1" || max_depth="6"
+  IFS=$'\n' match=($(find -maxdepth $max_depth -xdev -type d -name .git -exec dirname {} \; -prune | fzf))
+  # `cd` into matched directory
+  if [ -n "$match" ]; then
+    \cd -P "$match"
+  fi
+}
+alias gd='gitdirs'
+
+# vim: set ts=8 sw=2 tw=0 et ft=sh :
