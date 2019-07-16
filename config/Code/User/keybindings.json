@@ -1,0 +1,62 @@
+// Place your key bindings in this file to overwrite the defaults
+[
+  // >>> Unbind shortcut keys >>>
+  { "key": "ctrl+`", "command": "-workbench.action.terminal.toggleTerminal" },
+  { "key": "ctrl+j", "command": "-workbench.action.togglePanel" },
+  { "key": "ctrl+q", "command": "-workbench.action.quit" },
+  { "key": "ctrl+e", "command": "-workbench.action.quickOpen" },
+  { "key": "ctrl+shift+d", "command": "-workbench.view.debug" },
+  { "key": "ctrl+alt+-", "command": "-workbench.action.navigateBack" },
+  { "key": "ctrl+shift+-", "command": "-workbench.action.navigateForward" },
+  { "key": "ctrl+shift+p", "command": "-workbench.action.showCommands" },
+  { "key": "ctrl+shift+l", "command": "-editor.action.selectHighlights", "when": "editorFocus" },
+  { "key": "ctrl+tab", "command": "-workbench.action.openNextRecentlyUsedEditorInGroup" },
+  { "key": "ctrl+shift+tab", "command": "-workbench.action.openPreviousRecentlyUsedEditorInGroup" },
+  { "key": "ctrl+shift+f10", "command": "-editor.action.previewDeclaration", "when": "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor" },
+  { "key": "f12", "command": "-editor.action.goToDeclaration", "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor" },
+  { "key": "ctrl+f12", "command": "-editor.action.goToImplementation", "when": "editorHasImplementationProvider && editorTextFocus && !isInEmbeddedEditor" },
+  { "key": "shift+f12", "command": "-editor.action.referenceSearch.trigger", "when": "editorHasReferenceProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor" },
+  { "key": "shift+alt+f12", "command": "-references-view.find", "when": "editorHasReferenceProvider" },
+  // <<< Unbind shortcut keys <<<
+
+  // command palette
+  { "key": "ctrl+`", "command": "workbench.action.showCommands" },
+
+  // quick open
+  { "key": "ctrl+tab", "command": "workbench.action.quickOpen" },
+
+  // toggle terminal
+  { "key": "ctrl+e", "command": "workbench.action.terminal.toggleTerminal" },
+
+  // navigate backward
+  { "key": "alt+left", "command": "workbench.action.navigateBack" },
+  // navigate forward
+  { "key": "alt+right", "command": "workbench.action.navigateForward" },
+
+  // formatting
+  { "key": "ctrl+q", "command": "editor.action.formatSelection", "when": "editorHasSelection && editorTextFocus && !editorReadonly" },
+  { "key": "ctrl+q", "command": "editor.action.formatDocument", "when": "!editorHasSelection && editorTextFocus && !editorReadonly" },
+
+  // select all occurrencs of find match
+  { "key": "ctrl+shift+d", "command": "editor.action.selectHighlights", "when": "editorFocus" },
+
+  // fold
+  { "key": "ctrl+l", "command": "editor.fold", "when": "editorTextFocus" },
+  // unfold
+  { "key": "ctrl+shift+l", "command": "editor.unfold", "when": "editorTextFocus" },
+
+  // join lines
+  { "key": "ctrl+j", "command": "editor.action.joinLines", "when": "editorTextFocus" },
+
+  // peek definition
+  { "key": "f12", "command": "editor.action.previewDeclaration", "when": "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor" },
+  // goto definition
+  { "key": "alt+f12", "command": "editor.action.goToDeclaration", "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor" },
+  // goto implementation
+  { "key": "shift+alt+f12", "command": "editor.action.goToImplementation", "when": "editorHasImplementationProvider && editorTextFocus && !isInEmbeddedEditor" },
+  // peek all references
+  { "key": "ctrl+f12", "command": "editor.action.referenceSearch.trigger", "when": "editorHasReferenceProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor" },
+  // list all references
+  { "key": "shift+f12", "command": "references-view.find", "when": "editorHasReferenceProvider" }
+]
+
