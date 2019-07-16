@@ -1,0 +1,23 @@
+#!/bin/sh
+
+fader=/usr/bin/transset-df
+
+ok () { xcomp -q; }
+
+f() {
+  if ok
+  then
+    $fader -a $@
+  else
+    notify-send -t 2000 "Transparency" "xcompmgr is not running"
+  fi
+}
+
+case "$1" in
+  -i|--inc)    f --inc .01 ;;
+  -d|--dec)    f --dec .01 ;;
+  -t|--toggle) f --toggle ;;
+  *)           exit 1 ;;
+esac
+
+# vim: set ts=8 sw=2 tw=0 et syntax=sh:

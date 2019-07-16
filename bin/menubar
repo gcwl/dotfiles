@@ -1,0 +1,36 @@
+#!/bin/sh
+
+cachedir=${XDG_CACHE_HOME:-$HOME/.cache}
+if [ -d "$cachedir" ]; then
+    cachefile=$cachedir/dmenu_run
+else
+    cachefile=$HOME/.dmenu_cache # if no xdg dir, fall back to dotfile in ~
+fi
+
+IFS=:
+if stest -dqr -n "$cachefile" $PATH; then
+    stest -flx $PATH  > "$cachefile"
+fi
+
+
+## simple case: no alias support
+simple ()
+{
+    cat "$cachefile" | sort -u | dmenu -b -i "$@" | ${SHELL:-/bin/sh}
+}
+
+## complex case: with firejail aliases support
+notsimple ()
+{
+    source $HOME/.bash/firejail     # this is needed in order for compgen to work on next line
+    cmd=$(echo $(compgen -a) | cat - "$cachefile" | sort -u | dmenu -b -i "$@")
+
+    # manually source aliases, and set shopt for non-interactive shell before running cmd
+    cat <<HERE | ${SHELL:-/bin/sh}
+source $HOME/.bash/firejail
+shopt -s expand_aliases
+$cmd
+HERE
+}
+
+notsimple

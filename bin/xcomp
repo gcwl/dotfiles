@@ -1,0 +1,55 @@
+#/bin/sh
+#
+# Start a composition manager.
+# (xcompmgr in this case)
+
+mgr=/usr/bin/xcompmgr
+
+name=$(basename $mgr)
+prog=$(basename $0)
+
+# tune your own settings here
+opts="-cC -t-1 -l-3 -r2.2 -o.5"
+# opts="-cC"
+# opts="-CcfF -I-.015 -O-.03 -D6 -t-1 -l-3 -r4.2 -o.5"
+
+###
+
+usage() {
+  echo
+  echo "Composition Manager: $name"
+  echo "  (re)start : $prog -s"
+  echo "  stop      : $prog -k"
+  echo "  showargs  : $prog -p"
+  echo "  query     : $prog -q  # return status code 0 if $name is running; 1 otherwise."
+  echo
+}
+
+query() { /usr/bin/pgrep --exact $name &>/dev/null; }
+
+stop()  { query && killall $name; }
+
+start() {
+  stop  # restart if it's already running
+  $mgr $opts &
+}
+
+status() {
+  if query; then
+    echo "$name is running."
+  else
+    echo "$name is not running."
+  fi
+  echo
+}
+
+###
+
+case "$1" in
+  "")   usage; status ;;
+  "-s") start ;;
+  "-k") stop  ;;
+  "-p") echo $opts ;;
+  "-q") query ;;
+  *)    usage ;;
+esac

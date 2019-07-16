@@ -1,0 +1,22 @@
+#!/bin/sh
+
+website=$1
+wget -mkEp -np --random-wait -e robots=off -U mozilla $website
+
+# ==========================================================
+# 1) download an entire website
+# $ wget --random-wait -r -p -e robots=off -U mozilla http://www.example.com
+#
+#
+# 2) mirrow website using wget
+# https://www.guyrutenberg.com/2014/05/02/make-offline-mirror-of-a-site-using-wget/
+# short flag | long flag          | meaning
+# ---------- | ---------          | -------
+# -m         | --mirror           | Makes (among other things) the download recursive.
+# -k         | --convert-links    | convert all the links (also to stuff like CSS stylesheets) to relative, so it will be suitable for offline viewing.
+# -E         | --adjust-extension | Adds suitable extensions to filenames (html or css) depending on their content-type.
+# -p         | --page-requisites  | Download things like CSS style-sheets and images required to properly display the page offline.
+# -np        | --no-parent        | When recursing do not ascend to the parent directory. It useful for restricting the download to only a portion of the site.
+#
+# $ wget --mirror --convert-links --adjust-extension --page-requisites --no-parent http://example.org
+# $ wget -mkEpnp http://example.org

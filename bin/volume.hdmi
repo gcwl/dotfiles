@@ -1,0 +1,34 @@
+#!/bin/sh
+
+amixer="/usr/bin/amixer"
+amixer_flags="-q -M"
+#amixer_flags="-q"
+amixer_control="PCM"
+dvol=2
+
+notify_volume_level() {
+    local l=$(amixer get $amixer_control | awk -F"[][]" '/Front Left/ { print $2 }' | tr -d '\n')
+    local r=$(amixer get $amixer_control | awk -F"[][]" '/Front Right/ { print $2 }' | tr -d '\n')
+    notify-send -t 1000 "$1" "Left $l / Right $r"
+}
+
+volume_up() {
+    $amixer $amixer_flags set $amixer_control $dvol%+
+    notify_volume_level "Volume Up"
+}
+
+volume_down() {
+    $amixer $amixer_flags set $amixer_control $dvol%-
+    notify_volume_level "Volume Down"
+}
+
+usage () {
+  echo "Usage:"
+  echo "  $(basename $0) [up|dn]"
+}
+
+case "${1}" in
+    "up")        volume_up ;;
+    "dn"|"down") volume_down ;;
+    *)           usage; exit 1 ;;
+esac

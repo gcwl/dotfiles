@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# https://unix.stackexchange.com/questions/37329/efficiently-delete-large-directory-containing-thousands-of-files
+# https://stackoverflow.com/questions/1795370/unix-fast-remove-directory-for-cleaning-up-daily-builds
+
+_purgedir () {
+  local targetdir=$1
+
+  [[ -d $targetdir ]] && {
+    local tmpdir=$(mktemp -d)
+    /usr/bin/rsync -a --delete $tmpdir/ $targetdir/ \
+        && rmdir $targetdir $tmpdir \
+        && echo "$targetdir removed."
+  } || {
+    echo "$targetdir is not a directory."
+    exit 1
+  }
+}
+
+_purgedir $1
+
+# vim: set ts=8 sw=2 tw=0 et ft=sh :

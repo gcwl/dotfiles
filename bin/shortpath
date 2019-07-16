@@ -1,0 +1,44 @@
+#!/usr/bin/python
+
+import sys
+import os
+from os.path import join as opj
+
+def replace_home(path):
+    """replace home full path with ~"""
+    home = os.environ['HOME']
+    if path.startswith(home):
+        n = len(home)
+        return '~' + path[n:]
+    return path
+
+def shorten(w):
+    """\
+    shorten word to its first character
+    e.g. doc   -> d
+         .hide -> .h
+    """
+    return w[:2] if w[0] == '.' else w[0]
+
+def short_path(path):
+    path = replace_home(path)
+    path = list(path.split('/'))
+    last = path.pop()
+    path = [shorten(w) for w in path if len(w) > 0]
+    path.append(last)
+    return opj(*path)
+
+def test():
+    home = os.environ['HOME']
+    path = '/1/.hidden/2/3/ok/test'
+    print(shorten_path(home))
+    print(shorten_path(path))
+    print(shorten_path(home+path))
+
+if __name__ == '__main__':
+    try:
+        path = sys.argv[1]
+        print(short_path(path))
+    except:
+        prog = os.path.basename(sys.argv[0])
+        print('usage: {} <path>'.format(prog))

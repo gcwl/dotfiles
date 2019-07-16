@@ -1,0 +1,18 @@
+#!/bin/sh
+
+which=/usr/bin/which
+
+confirm_empty_trash() {
+  /usr/bin/trash-list
+  read -p "Empty Trash? [N/y] " yn
+  case $yn in
+    [Yy]) /usr/bin/trash-empty; echo "Trash Emptied." ;;
+    *)    ;;
+  esac
+}
+
+if ! $which trash-list &>/dev/null; then
+  echo "trash-cli is not installed in the system."
+else
+  confirm_empty_trash
+fi

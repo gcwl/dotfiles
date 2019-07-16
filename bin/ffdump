@@ -1,0 +1,98 @@
+#!/usr/bin/sh
+
+usage ()
+{
+    echo -e "Dump firefox bookmarks/cookies/sessions:"
+    echo
+    echo -e "\t$(basename $0) (-b|--bookmarks) [/path/to/.mozilla/firefox/*default]"
+    echo -e "\t$(basename $0) (-c|--cookies) [/path/to/.mozilla/firefox/*default]"
+    echo -e "\t$(basename $0) (-s|--sessions) [/path/to/.mozilla/firefox/*default/sessionstore-backups]"
+    echo
+}
+
+bookmarks()
+{
+    ##-------------------------------------------------------------##
+    ## sqlite3 cmd to extract Firefox bookmarks from places.sqlite ##
+    ##-------------------------------------------------------------##
+
+    local dir=${1:-$HOME/.mozilla/firefox/*default}
+    local db=$dir/places.sqlite
+
+    local query="select a.url, a.title from moz_places a, moz_bookmarks b where a.id=b.fk;"
+    ## b.parent=2 in the command refers to the bookmarks folder to extract
+    ## b.parent=3 in the command refers to the bookmarks bar to extract
+    #local query="select a.url, a.title from moz_places a, moz_bookmarks b where a.id=b.fk and (b.parent=2 or b.parent=3);"
+
+    sqlite3 $db "$query"
+}
+
+sessions ()
+{
+    ##------------------------------------------------##
+    ## extract all urls from the last firefox session ##
+    ##------------------------------------------------##
+
+    local dir=${1:-$HOME/.mozilla/firefox/*default/sessionstore-backups}
+    local jsfile=$dir/recovery.js
+    local sessionstore=$(/usr/bin/ls -t $jsfile | sed q)
+    /usr/bin/grep -oP '"url":"\K[^"]+' $sessionstore
+}
+
+cookies ()
+{
+    local dir=${1:-$HOME/.mozilla/firefox/*default}
+    local db=$dir/cookies.sqlite
+
+    sqlite3 $db "select * from moz_cookies;"
+
+# The layout of Netscape's cookies.txt file is such that each line contains one name-value pair.
+# An example cookies.txt file may have an entry that looks like this:
+#
+# .netscape.com   TRUE   /   FALSE   946684799   NETSCAPE_ID   100103
+#
+# Each line represents a single piece of stored information.
+# A tab is inserted between each of the fields.
+#
+# field      | meaning
+# -----      | -------
+# domain     | The domain that created AND that can read the variable.
+# flag       | A TRUE/FALSE value indicating if all machines within a given domain can access the variable.
+#            | This value is set automatically by the browser, depending on the value you set for domain.
+# path       | The path within the domain that the variable is valid for.
+# secure     | A TRUE/FALSE value indicating if a secure connection with the domain is needed to access the variable.
+# expiration | The UNIX time that the variable will expire on.
+#            | UNIX time is defined as the number of seconds since Jan 1, 1970 00:00:00 GMT.
+# name       | The name of the variable.
+# value      | The value of the variable.
+
+## https://curl.haxx.se/mail/lib-2001-05/0053.html
+# According to a description of the format I have got, it means:
+#
+# flag: A TRUE/FALSE value indicating if all machines within a
+# given domain can access the variable. This value is set automatically
+# by the browser, depending on the value you set for the domain.
+#
+# As far as I can see, it is set to true when the cookie says .domain.com
+# and to false when the domain is complete www.domain.com
+
+#    local sep=${2:-|}
+#    cat <<QUERY | sqlite3 -separator $sep $db
+#select
+#    host,
+#    case when host like '.%' then 'TRUE' else 'FALSE' end,
+#    path,
+#    case when isSecure=1 then 'TRUE' else 'FALSE' end,
+#    expiry,
+#    name,
+#    value
+#from moz_cookies;
+#QUERY
+}
+
+case "$1" in
+    -b|--bookmarks) shift; bookmarks $@ ;;
+    -c|--cookies)   shift; cookies $@ ;;
+    -s|--sessions)  shift; sessions $@ ;;
+    -h|--help|*)    usage ;;
+esac

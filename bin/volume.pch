@@ -1,0 +1,57 @@
+#!/usr/bin/sh
+
+amixer_control="Master"
+
+# notify_volume_level() {
+#     local v=$(amixer get $control | awk -F"[][]" '/dB/ { print $2 }')
+#     notify-send -t 500 -u low "Volume $v"
+# }
+
+volume_level() {
+  local l=$(amixer get $amixer_control | awk -F"[][]" '/Front Left:/  { print $2 }' | tr -d '\n')
+  local r=$(amixer get $amixer_control | awk -F"[][]" '/Front Right:/ { print $2 }' | tr -d '\n')
+  echo "Left $l / Right $r"
+}
+
+notify_volume_level() {
+  local subject=${1:-"Volume"}
+  local level=$(volume_level)
+  notify-send -t 1000 "$subject" "$level"
+}
+
+volume_onoff() {
+  local l=$(amixer get $amixer_control | awk -F"[][]" '/Front Left:/  { print $4 }' | tr -d '\n')
+  local r=$(amixer get $amixer_control | awk -F"[][]" '/Front Right:/ { print $4 }' | tr -d '\n')
+  echo "Left $l / Right $r"
+}
+
+notify_volume_onoff() {
+  local subject=${1:-"Volume"}
+  local onoff=$(volume_onoff)
+  notify-send -t 1000 -u critical "$subject" "$onoff"
+}
+
+volume_up() {
+  amixer -q set $amixer_control 2%+ unmute
+  notify_volume_level "Volume Up"
+}
+
+volume_down() {
+  amixer -q set $amixer_control 2%- unmute
+  notify_volume_level "Volume Down"
+}
+
+volume_toggle() {
+  amixer -q set $amixer_control toggle
+  notify_volume_onoff "Volume Toggle"
+}
+
+case "${1}" in
+  up)      volume_up ;;
+  dn|down) volume_down ;;
+  toggle)  volume_toggle ;;
+  status)  volume_onoff; volume_level ;;
+  *) exit 1 ;;
+esac
+
+# vim: set ts=8 sw=2 tw=0 et ft=sh :

@@ -1,0 +1,26 @@
+#!/usr/bin/python
+
+from psutil import virtual_memory, cpu_percent, sensors_temperatures
+from statistics import mean
+
+def bars(percent, maxn=10):
+    n = int(maxn * percent / 100.)
+    sticks = '|' * n
+    blanks = ' ' * (maxn - n)
+    return sticks + blanks
+
+def info():
+    cpu_perc = cpu_percent(interval=2)
+    cpu_bars = bars(cpu_perc)
+    mem = virtual_memory()
+    temp = sensors_temperatures()
+    ct = temp['coretemp']
+    t = int(mean(t.current for t in ct))
+
+    return 'cpu:[{}]{}% mem:{}% temp:{}C'.format(cpu_bars,
+                                                 int(cpu_perc),
+                                                 int(mem.percent),
+                                                 t)
+
+if __name__ == '__main__':
+    print(info())

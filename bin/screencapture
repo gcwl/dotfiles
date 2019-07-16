@@ -1,0 +1,22 @@
+#!/bin/sh
+
+savedir=$HOME/Desktop
+
+if [ "$#" -lt 2 ]; then
+  echo "Usage: $(basename $0) [--rectangle|--window|--all] [--yes|--no]"
+  exit 1
+fi
+
+opts="--quality 70"
+case "$1" in
+  --rec*) opts="$opts --select" ;;
+  --win*) opts="$opts --select --border" ;;
+  --all|--whole) ;;
+esac
+
+case "$2" in
+  -y|--yes)  execmd="mv \$f $savedir; mtpaint $savedir/\$f" ;;
+  -n|--no|*) execmd="mv \$f $savedir" ;;
+esac
+
+scrot $opts -e "$execmd"
