@@ -1,0 +1,129 @@
+" All system-wide defaults are set in $VIMRUNTIME/archlinux.vim (usually just
+" /usr/share/vim/vimfiles/archlinux.vim) and sourced by the call to :runtime
+" you can find below.  If you wish to change any of those settings, you should
+" do it in this file (/etc/vimrc), since archlinux.vim will be overwritten
+" everytime an upgrade of the vim packages is performed.  It is recommended to
+" make changes after sourcing archlinux.vim since it alters the value of the
+" 'compatible' option.
+
+" This line should not be removed as it ensures that various options are
+" properly set to work with the Vim-related packages.
+runtime! archlinux.vim
+
+" If you prefer the old-style vim functionalty, add 'runtime! vimrc_example.vim'
+" Or better yet, read /usr/share/vim/vim73/vimrc_example.vim or the vim manual
+" and configure vim to your own liking!
+
+
+
+colorscheme tabula
+
+syntax on
+
+" line numbers
+set number
+
+" set 7 lines to the curors - when moving vertical..
+set so=7
+
+" always show current position
+set ruler
+
+" highlight search things
+set hlsearch
+
+" fancy menu
+set wildmenu
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+" 4 spaces for indenting
+set shiftwidth=4
+
+"" 4 stops
+"set tabstop=4
+"
+"" Spaces instead of tabs
+"set expandtab
+"
+"" Sets the number of columns for a TAB
+"set softtabstop=4
+
+" select when using the mouse
+set selectmode=mouse
+
+" set the commandheight
+set cmdheight=2
+
+" show the cursor position all the time
+set ruler
+
+" show (partial) commands
+set showcmd
+
+" do incremental searches (annoying but handy);
+set incsearch
+
+" Set ignorecase on
+set ignorecase
+
+" smart search (override 'ic' when pattern has uppers)
+set scs
+
+set smartcase
+
+" set vim to use 'short messages'.
+set shortmess=a
+
+" showmatch: Show the matching bracket for the last ')'?
+set showmatch
+
+" Always display a status line at the bottom of the window
+set laststatus=2
+
+" Show tab and trailing whitespaces with speical characters
+" :help listchars
+set list listchars=tab:»·,trail:·
+
+
+
+" Set status line
+"set statusline=[%02n]\ %f\ %(\[%M%R%H]%)%=\ %4l,%02c%2V\ %P%*
+let s  = ""
+let s .= "%<"                                 | " truncate at the start
+let s .= "%f%8* "                             | " file name
+let s .= "%r"                                 | " readonly flag
+let s .= '%{&bomb?"!":""} '                   | " byte-order mark flag
+let s .= "%*%="                               | " right-justify after here
+let s .= "%9*%m%* "                           | " modified flag
+let s .= "0x%02B "                            | " hex value of current byte
+let s .= "%l"                                 | " current line
+let s .= ":%c%V"                              | " column number, virtual column (if different)
+let s .= " %P"                                | " percentage
+let s .= "/%LL"                               | " number of lines
+set statusline=%!s
+
+
+
+" =============================================================
+" Auto commands
+" Automatically remove all trailing whitespace upon :write (:w)
+" http://vim.wikia.com/wiki/Remove_unwanted_spaces#Automatically_removing_all_trailing_whitespace
+" =============================================================
+autocmd BufWritePre * :%s/\s\+$//e
+
+
+
+""
+"" Key bindings (re)map
+""
+" toggle line numbers
+nnoremap <F9> :set number!<CR>
+
+" :help window-move-cursor
+nnoremap <C-J> <C-W>j
+nnoremap <C-K> <C-W>k
+nnoremap <C-H> <C-W>h
+nnoremap <C-L> <C-W>l
+" :help window-moving
