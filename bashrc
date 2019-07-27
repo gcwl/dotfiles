@@ -112,17 +112,14 @@ alias ..5='cd ../../../../..'
 # ls
 # alias ls='ls -hF --time-style="+%Y.%m.%d-%H:%M:%S" --color=auto --group-directories-first'
 alias ls='ls -hF --time-style="+%F %T" --color=auto --group-directories-first'
+alias lsl='ls -l'
 alias lr='ls -R'
 alias la='ls -A'
-alias ll='ls -l'
-#alias lA="find -maxdepth 1 -regex '^\.\/\..+' -ls | awk '{print \$3,\$4,\$5,\$6,\$7,\"\t\",\$8,\$9,\$10,\"\t\",\$11}'"
-alias lA='ls -lA'
-alias lx='lA -BX'           # sort by extension
-alias lz='lA -rS'           # sort by size
-alias lt='lA -rt'           # sort by modification time
+alias ll='ls -lA'
+alias lx='ll -BX'           # sort by extension
+alias lz='ll -rS'           # sort by size
+alias lt='ll -rt'           # sort by modification time
 alias lu='lt -u'            # sort by access time
-alias ldir='ll | \grep ^d'  # list directories
-alias lldir='find -maxdepth 1 -type d -ls'
 
 
 # safety features
@@ -148,7 +145,7 @@ alias g='grep'
 alias b='echo -en "\n\n\n\n\n"' # blank lines
 
 
-#alias xmount='sudo mount -o uid=$(id -u),gid=$(id -g),file_mode=644,dir_mode=755'
+alias xmount='sudo mount -o uid=$(id -u),gid=$(id -g),file_mode=644,dir_mode=755'
 alias fatmount='sudo mount -t vfat -o uid=$(id -u),gid=$(id -g),fmask=133,dmask=022'
 alias umount='sudo umount'
 
