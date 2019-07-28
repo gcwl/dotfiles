@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# https://unix.stackexchange.com/questions/181937/how-create-a-temporary-file-in-shell-script
+# https://stackoverflow.com/questions/687014/removing-created-temp-files-in-unexpected-bash-exit
+# http://www.imagemagick.org/Usage/resize/
+# http://www.imagemagick.org/Usage/blur/
+
+# create temp file and set trap to remove file when exit
+tmpfile=$(mktemp /tmp/screenlock-XXXXXXXXXXXXXXXX.png)
+trap 'rm -f -- "$tmpfile"' INT TERM HUP EXIT
+
+# screen capture
+scrot --silent --quality=100 "$tmpfile"
+# blur image
+mogrify -scale 5% -blur 0x1 -resize 2000% "$tmpfile"
+# screen lock
+i3lock -ef -i "$tmpfile"
+
+#  vim: set ts=8 sw=4 tw=0 et :
